@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Recapitulando - Tu Rastreador de Series</title>
+  <meta name="description"
+    content="Lleva el control de tus series favoritas con Recapitulando. Nunca olvides por qué capítulo vas.">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script type="module" src="../src/main.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <header class="glass-nav">
+      <div class="logo">
+        <span class="logo-icon">🎬</span>
+        <h1>Recapitulando</h1>
+      </div>
+      <div class="header-actions">
+        <button id="auth-btn" class="secondary-btn">
+          <span class="status-dot"></span>
+          <span id="user-display">Sincronizar</span>
+        </button>
+        <button id="add-btn" class="primary-btn">
+          <span class="icon">+</span>
+          <span class="text">Añadir</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="stats-bar glass animate-in">
+      <div class="stat-item">
+        <span class="stat-value" id="stats-total">0</span>
+        <span class="stat-label">Series</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="stats-time">0h</span>
+        <span class="stat-label">Tiempo total</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="stats-finished">0</span>
+        <span class="stat-label">Terminadas</span>
+      </div>
+    </div>
+
+    <nav class="tabs-container animate-in">
+      <button class="tab-btn active" data-tab="watching">Viendo</button>
+      <button class="tab-btn" data-tab="pending">Pendientes</button>
+      <button class="tab-btn" data-tab="finished">Terminadas</button>
+    </nav>
+
+    <main>
+      <div id="empty-state" class="hidden">
+        <div class="empty-content">
+          <span class="emoji">🍿</span>
+          <h2>¡Nada por aquí!</h2>
+          <p>Busca una serie para empezar tu aventura.</p>
+        </div>
+      </div>
+
+      <div id="series-grid" class="series-grid">
+        <!-- Series cards will be injected here -->
+      </div>
+    </main>
+
+    <!-- Search Modal -->
+    <div id="search-modal" class="modal hidden">
+      <div class="modal-content glass">
+        <header class="modal-header">
+          <h2>Buscar Serie</h2>
+          <button id="close-modal" class="close-btn">&times;</button>
+        </header>
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="Nombre de la serie..." autocomplete="off">
+          <div id="search-loader" class="loader hidden"></div>
+        </div>
+        <div id="search-results" class="results-container">
+          <!-- Search results will appear here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Trailer Modal -->
+    <div id="trailer-modal" class="modal hidden">
+      <div class="modal-content glass trailer-content">
+        <header class="modal-header">
+          <h2 id="trailer-title">Tráiler</h2>
+          <div class="header-actions">
+            <button onclick="window.open(window.currentTrailerSearch, '_blank')" class="action-btn"
+              style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171;">Ver
+              en YouTube</button>
+            <button id="close-trailer" class="close-btn">&times;</button>
+          </div>
+        </header>
+        <div class="video-container">
+          <div id="trailer-loader" class="trailer-loader">
+            <div class="loader"></div>
+            <span>Buscando tráiler...</span>
+          </div>
+          <iframe id="trailer-player" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+
+</html>
