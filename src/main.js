@@ -2,11 +2,13 @@ import './style.css'
 import { db, auth } from './firebase.js'
 import { collection, doc, setDoc, onSnapshot, query, where, deleteDoc } from 'firebase/firestore'
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth'
+import { initCalendar, renderCalendar, openAddToCalendarModal, closeAddToCalendarModal } from './calendar.js'
 
 // --- State Management ---
 let series = [];
 let currentUser = null;
 let currentTab = 'watching';
+let currentView = 'list'; // 'list' or 'calendar'
 
 // --- DOM Elements ---
 const seriesGrid = document.getElementById('series-grid');
@@ -63,6 +65,7 @@ function syncFromFirestore() {
     series = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     localStorage.setItem('recap_series', JSON.stringify(series));
     render();
+    initCalendar(currentUser, series); // Initialize calendar with synced data
   }, (error) => {
     console.warn("Error en la sincronización (posiblemente reglas de Firebase):", error);
     authBtn.classList.remove('synced'); // Add this to show error state in UI
@@ -70,6 +73,7 @@ function syncFromFirestore() {
     if (series.length === 0) {
       series = JSON.parse(localStorage.getItem('recap_series')) || [];
       render();
+      initCalendar(currentUser, series);
     }
   });
 }
@@ -109,6 +113,20 @@ function calculateStats() {
 }
 
 function render() {
+  // Toggle view visibility
+  const mainView = document.getElementById('series-view');
+  const calendarView = document.getElementById('calendar-view');
+
+  if (currentView === 'calendar') {
+    mainView.classList.add('hidden');
+    calendarView.classList.remove('hidden');
+    initCalendar(currentUser, series);
+    return;
+  } else {
+    mainView.classList.remove('hidden');
+    calendarView.classList.add('hidden');
+  }
+
   const filteredSeries = series.filter(s => s.statusTab === currentTab);
   calculateStats();
 
@@ -351,6 +369,23 @@ trailerModal.addEventListener('click', (e) => {
   if (e.target === trailerModal) window.closeTrailerModal();
 });
 
+// View Switching
+window.switchView = (view) => {
+  currentView = view;
+
+  // Update nav buttons
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+
+  render();
+};
+
+// Calendar functions
+window.openAddToCalendarModal = openAddToCalendarModal;
+window.closeAddToCalendarModal = closeAddToCalendarModal;
+
 // Initial Render from LocalStorage first
 series = JSON.parse(localStorage.getItem('recap_series')) || [];
 render();
+initCalendar(null, series);

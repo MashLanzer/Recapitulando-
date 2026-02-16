@@ -23,6 +23,19 @@
         <span class="logo-icon">🎬</span>
         <h1>Recapitulando</h1>
       </div>
+      <div class="view-switcher"
+        style="display: flex !important; gap: 8px; padding: 4px; background: rgba(99, 102, 241, 0.2); border-radius: 12px; border: 1px solid rgba(99, 102, 241, 0.3);">
+        <button class="view-btn active" data-view="list" onclick="switchView('list')"
+          style="padding: 8px 16px; border-radius: 8px; border: none; background: rgba(99, 102, 241, 0.8); color: white; font-weight: 600; cursor: pointer;">
+          <span class="icon">📋</span>
+          <span class="text">Lista</span>
+        </button>
+        <button class="view-btn" data-view="calendar" onclick="switchView('calendar')"
+          style="padding: 8px 16px; border-radius: 8px; border: none; background: rgba(255, 255, 255, 0.1); color: white; font-weight: 600; cursor: pointer;">
+          <span class="icon">📅</span>
+          <span class="text">Calendario</span>
+        </button>
+      </div>
       <div class="header-actions">
         <button id="auth-btn" class="secondary-btn">
           <span class="status-dot"></span>
@@ -57,16 +70,33 @@
     </nav>
 
     <main>
-      <div id="empty-state" class="hidden">
-        <div class="empty-content">
-          <span class="emoji">🍿</span>
-          <h2>¡Nada por aquí!</h2>
-          <p>Busca una serie para empezar tu aventura.</p>
+      <!-- Series List View -->
+      <div id="series-view">
+        <div id="empty-state" class="hidden">
+          <div class="empty-content">
+            <span class="emoji">🍿</span>
+            <h2>¡Nada por aquí!</h2>
+            <p>Busca una serie para empezar tu aventura.</p>
+          </div>
+        </div>
+
+        <div id="series-grid" class="series-grid">
+          <!-- Series cards will be injected here -->
         </div>
       </div>
 
-      <div id="series-grid" class="series-grid">
-        <!-- Series cards will be injected here -->
+      <!-- Calendar View -->
+      <div id="calendar-view" class="hidden">
+        <div class="calendar-header glass">
+          <h2>Tu Calendario de Series</h2>
+          <button class="primary-btn" onclick="openAddToCalendarModal()">
+            <span class="icon">+</span>
+            <span>Organizar Series</span>
+          </button>
+        </div>
+        <div id="calendar-grid" class="calendar-grid">
+          <!-- Calendar days will be injected here -->
+        </div>
       </div>
     </main>
 
@@ -105,6 +135,22 @@
             <span>Buscando tráiler...</span>
           </div>
           <iframe id="trailer-player" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add to Calendar Modal -->
+    <div id="add-to-calendar-modal" class="modal hidden">
+      <div class="modal-content glass">
+        <header class="modal-header">
+          <h2>Organizar Series en Calendario</h2>
+          <button onclick="closeAddToCalendarModal()" class="close-btn">&times;</button>
+        </header>
+        <div class="calendar-series-selector">
+          <p class="helper-text">Asigna tus series a días específicos de la semana</p>
+          <div id="calendar-series-list" class="calendar-series-list">
+            <!-- Series list will be injected here -->
+          </div>
         </div>
       </div>
     </div>
