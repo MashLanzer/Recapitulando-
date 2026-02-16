@@ -2,7 +2,7 @@ import './style.css'
 import { db, auth } from './firebase.js'
 import { collection, doc, setDoc, onSnapshot, query, where, deleteDoc } from 'firebase/firestore'
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth'
-import { initCalendar, renderCalendar, openAddToCalendarModal, closeAddToCalendarModal } from './calendar.js'
+import { initCalendar, renderCalendar, openAddToCalendarModal, closeAddToCalendarModal, getSeriesScheduledDay, setCalendarChangeCallback } from './calendar.js'
 
 // --- State Management ---
 let series = [];
@@ -148,9 +148,12 @@ function render() {
   } else {
     // Hide empty state and show grid
     emptyState.classList.add('hidden');
-    seriesGrid.innerHTML = filteredSeries.map((s, index) => `
+    seriesGrid.innerHTML = filteredSeries.map((s, index) => {
+      const scheduledDay = getSeriesScheduledDay(s.id);
+      return `
             <div class="series-card" style="animation-delay: ${index * 0.1}s">
                 <div class="status-badge">${s.status}</div>
+                ${scheduledDay ? `<div class="calendar-day-badge">📅 ${scheduledDay}</div>` : ''}
                 <div class="poster-container">
                     <img src="${s.image || 'https://via.placeholder.com/200x300?text=No+Image'}" alt="${s.name}">
                     <div class="card-overlay"></div>
@@ -189,7 +192,8 @@ function render() {
                     </div>
                 </div>
             </div>
-        `).join('');
+        `;
+    }).join('');
   }
 }
 
@@ -384,6 +388,13 @@ window.switchView = (view) => {
 // Calendar functions
 window.openAddToCalendarModal = openAddToCalendarModal;
 window.closeAddToCalendarModal = closeAddToCalendarModal;
+
+// Set callback to re-render when calendar changes
+setCalendarChangeCallback(() => {
+  if (currentView === 'list') {
+    render();
+  }
+});
 
 // Initial Render from LocalStorage first
 series = JSON.parse(localStorage.getItem('recap_series')) || [];

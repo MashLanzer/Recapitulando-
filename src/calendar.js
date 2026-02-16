@@ -5,6 +5,7 @@ import { collection, doc, setDoc, onSnapshot, deleteDoc } from 'firebase/firesto
 let currentUser = null;
 let calendarData = {}; // { 'monday': [seriesId1, seriesId2], 'tuesday': [...] }
 let series = [];
+let onCalendarChangeCallback = null; // Callback to notify main app of changes
 
 const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 const dayNames = {
@@ -16,6 +17,26 @@ const dayNames = {
     saturday: 'Sábado',
     sunday: 'Domingo'
 };
+
+// Helper function to get which day a series is scheduled on
+export function getSeriesScheduledDay(seriesId) {
+    for (const day of days) {
+        if (calendarData[day] && calendarData[day].includes(seriesId)) {
+            return dayNames[day];
+        }
+    }
+    return null;
+}
+
+// Export calendar data for use in main
+export function getCalendarData() {
+    return calendarData;
+}
+
+// Set callback for when calendar changes
+export function setCalendarChangeCallback(callback) {
+    onCalendarChangeCallback = callback;
+}
 
 // Initialize Calendar
 export function initCalendar(user, userSeries) {
@@ -54,14 +75,17 @@ function syncCalendarFromFirestore() {
 async function saveCalendarToCloud() {
     if (!currentUser) {
         localStorage.setItem('recap_calendar', JSON.stringify(calendarData));
+        if (onCalendarChangeCallback) onCalendarChangeCallback();
         return;
     }
 
     try {
         await setDoc(doc(db, 'users', currentUser.uid, 'calendar', 'weekly'), calendarData);
+        if (onCalendarChangeCallback) onCalendarChangeCallback();
     } catch (e) {
         console.error("Error saving calendar:", e);
         localStorage.setItem('recap_calendar', JSON.stringify(calendarData));
+        if (onCalendarChangeCallback) onCalendarChangeCallback();
     }
 }
 

@@ -207,6 +207,36 @@ main {
   font-size: 0.75rem;
   font-weight: 600;
   border: 1px solid var(--glass-border);
+  z-index: 2;
+}
+
+.calendar-day-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%);
+  backdrop-filter: blur(8px);
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: white;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+
+  0%,
+  100% {
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+  }
 }
 
 /* Counters */
